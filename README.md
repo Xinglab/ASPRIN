@@ -48,7 +48,7 @@ Usage:
     $ asprin [-h] [-g Genotype file] [-c CLIP-seq mapped reads file]
               [-r RNA-seq mapped reads file] [-s dbSNP VCF file]
               [-e RADAR RNA editing database file]
-              [-t Number of threads default: 20] [-a]
+              [-t Number of threads default: 25] [-a]
 
      ASPRIN: Allele Specific Protein-RNA Interaction
 
