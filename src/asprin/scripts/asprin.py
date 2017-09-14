@@ -95,7 +95,7 @@ def main() :
 
       sys.stderr.write('Loading genotype information: ' + args.genotype +' \n')
       is_variant_id = False
-      if ((radar_fn == "" and dbsnp_fn == "") or args.allvariants):
+      if ((radar_fn == "" and dbsnp_fn == "") or (args.allvariants==True)): 
         is_variant_id = True
 
       x.genotype_info, x.snp_counter = Genotype().read_genotype_info(args.genotype, is_variant_id)
