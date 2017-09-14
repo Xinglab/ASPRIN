@@ -22,17 +22,11 @@ from collections import defaultdict
 import progressbar
 
 class Genotype :
-  def __init__(self, genotype_fn, dbsnp_fn, radar_fn, all_variants) :
-    self.genotype_fn = genotype_fn
-    self.dbsnp_fn = dbsnp_fn
-    self.radar_fn = radar_fn
-    self.dbsnp_counter = 0
-    self.radar_counter = 0
-    self.all_variants = all_variants
+  def __init__(self) :
     self.dbsnp_size = 323138224
     self.radar_size = 2576459
 
-  def read_genotype_info(self):
+  def read_genotype_info(self, genotype_fn, is_variant_id):
 
     VCF_HEADER = ['CHROM','POS','ID','REF','ALT','QUAL',\
                   'FILTER','INFO','FORMAT','SAMPLE']
@@ -40,14 +34,11 @@ class Genotype :
     snp_counter = 0
 
     variant_id = "none"
-    is_variant_id = False
-    if ((self.radar_fn == "" and self.dbsnp_fn == "") or self.all_variants):
-      is_variant_id = True
 
-    if self.genotype_fn.split('.')[-1]=="gz":
-      vcf_in = gzip.open(self.genotype_fn)
+    if genotype_fn.split('.')[-1]=="gz":
+      vcf_in = gzip.open(genotype_fn)
     else:
-      vcf_in = open(self.genotype_fn)
+      vcf_in = open(genotype_fn)
 
     for line in vcf_in:
       if line.startswith('#'):
@@ -79,60 +70,61 @@ class Genotype :
             genotype_info[result['CHROM']][int(result['POS'])] = \
                                               [alleles[0],alleles[1],variant_id]
     vcf_in.close()
+    return genotype_info, snp_counter
 
-    DBSNP_HEADER = ['CHROM','POS','ID','REF','ALT','QUAL','FILTER','INFO']
+
+
+  def apply_RADAR(self, radar_fn, genotype_info) :
+    ret_genotype_info = genotype_info
+    radar_counter = 0
     RADAR_HEADER = ['chromosome','position','gene','strand','annot1','annot2',\
                     'alu?','non_alu_repetitive?','conservation_chimp',\
                     'conservation_rhesus','conservation_mouse']
+    radar_in = open(radar_fn)
+    bar = progressbar.ProgressBar(maxval=self.radar_size, \
+      widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
+    bar.start()
+    for line in radar_in:
+      fields = line.rstrip().split()
+      if fields[0] == "chromosome":
+        continue
+      result = {}
+      for i,col in enumerate(RADAR_HEADER):
+        result[col] = fields[i]
+      if (result['chromosome'] in ret_genotype_info and \
+          int(result['position']) in ret_genotype_info[result['chromosome']]) :
+        ret_genotype_info[result['chromosome']][int(result['position'])][2] = \
+                                                "re" + str(radar_counter)
+      radar_counter += 1
+      if (radar_counter <= self.radar_size) :
+        bar.update(radar_counter)
+    radar_in.close()
+    bar.finish()
+    return ret_genotype_info, radar_counter
 
-    if (self.radar_fn != ""):
-      sys.stderr.write('Readig RADAR editing events: ' + self.radar_fn + '\n')
-      radar_in = open(self.radar_fn)
 
-      bar = progressbar.ProgressBar(maxval=self.radar_size, \
-        widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
-      bar.start()
-      for line in radar_in:
-        fields = line.rstrip().split()
-        if fields[0] == "chromosome":
-          continue
-        result = {}
-        for i,col in enumerate(RADAR_HEADER):
-          result[col] = fields[i]
-        if (result['chromosome'] in genotype_info and \
-            int(result['position']) in genotype_info[result['chromosome']]) :
-          genotype_info[result['chromosome']][int(result['position'])][2] = \
-                                                  "re" + str(self.radar_counter)
-        self.radar_counter += 1
-        if (self.radar_counter <= self.radar_size) :
-          bar.update(self.radar_counter)
-      radar_in.close()
-      bar.finish()
-      sys.stderr.write('\n')
-
-    if (self.dbsnp_fn != ""):
-      sys.stderr.write('Reading dbSNP SNPs: ' + self.dbsnp_fn +' \n')
-      dbsnp_in = open(self.dbsnp_fn)
-
-      bar = progressbar.ProgressBar(maxval=self.dbsnp_size, \
-        widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
-      bar.start()
-      for line in dbsnp_in:
-        if line.startswith('#'):
-          continue
-        result = {}
-        fields = line.rstrip().split()
-        for i,col in enumerate(DBSNP_HEADER):
-          result[col] = fields[i]
-        chrom = "chr" + result['CHROM']
-        if (chrom in genotype_info and \
-            int(result['POS']) in genotype_info[chrom]) :
-          genotype_info[chrom][int(result['POS'])][2] = result['ID']
-        self.dbsnp_counter += 1
-        if (self.dbsnp_counter <= self.dbsnp_size) :
-          bar.update(self.dbsnp_counter)
-      dbsnp_in.close()
-      bar.finish()
-      sys.stderr.write('\n')
-
-    return genotype_info, snp_counter
+  def apply_dbSNP(self, dbsnp_fn, genotype_info) :
+    ret_genotype_info = genotype_info
+    dbsnp_counter = 0
+    DBSNP_HEADER = ['CHROM','POS','ID','REF','ALT','QUAL','FILTER','INFO']
+    dbsnp_in = open(dbsnp_fn)
+    bar = progressbar.ProgressBar(maxval=self.dbsnp_size, \
+      widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
+    bar.start()
+    for line in dbsnp_in:
+      if line.startswith('#'):
+        continue
+      result = {}
+      fields = line.rstrip().split()
+      for i,col in enumerate(DBSNP_HEADER):
+        result[col] = fields[i]
+      chrom = "chr" + result['CHROM']
+      if (chrom in ret_genotype_info and \
+          int(result['POS']) in ret_genotype_info[chrom]) :
+        ret_genotype_info[chrom][int(result['POS'])][2] = result['ID']
+      dbsnp_counter += 1
+      if (dbsnp_counter <= self.dbsnp_size) :
+        bar.update(dbsnp_counter)
+    dbsnp_in.close()
+    bar.finish()
+    return ret_genotype_info, dbsnp_counter

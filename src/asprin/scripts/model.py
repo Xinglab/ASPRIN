@@ -32,7 +32,7 @@ class Model :
   def __init__(self, minimum_coverage) :
     self.minimum_coverage = minimum_coverage
 
-  def perform_test(self, genotype_info, clip_reads, rna_reads) :
+  def perform_test(self, genotype_info, clip_reads, clip_coverage, rna_reads, rna_coverage) :
     asprin_test = defaultdict(lambda: defaultdict(list))
     asprin_pvalues = []
     asprin_odds_ratio = []

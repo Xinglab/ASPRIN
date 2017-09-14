@@ -62,7 +62,7 @@ def main() :
   parser.add_argument("-e", metavar="RADAR RNA editing database file", \
                       dest="radar")
   parser.add_argument("-t", type=int, default=25, dest="nthreads", \
-                      metavar="Number of threads (default: 20)")
+                      metavar="Number of threads (default: 25)")
   parser.add_argument("-a", default="False", help="Use all the variants", \
                       action="store_true", dest="allvariants")
 
@@ -91,23 +91,38 @@ def main() :
         radar_fn = args.radar
 
       minimum_coverage = 10
-      x = Coverage(args.clipseq, args.rnaseq, minimum_coverage, \
-                   args.nthreads, args.allvariants)
+      x = Coverage(args.clipseq, args.rnaseq, minimum_coverage)
 
       sys.stderr.write('Loading genotype information: ' + args.genotype +' \n')
+      is_variant_id = False
+      if ((radar_fn == "" and dbsnp_fn == "") or args.allvariants):
+        is_variant_id = True
 
-      x.genotype_info, \
-      x.snp_counter = Genotype(args.genotype, dbsnp_fn, radar_fn, \
-                               args.allvariants).read_genotype_info()
+      x.genotype_info, x.snp_counter = Genotype().read_genotype_info(args.genotype, is_variant_id)
+
+      if (radar_fn != ""):
+        sys.stderr.write('Readig RADAR editing events: ' + radar_fn + '\n')
+        x.genotype_info, x.radar_counter = Genotype().apply_RADAR(radar_fn, x.genotype_info)
+
+      if (dbsnp_fn != ""):
+        sys.stderr.write('Reading dbSNP SNPs: ' + dbsnp_fn + '\n')
+        x.genotype_info, x.dbsnp_counter = Genotype().apply_dbSNP(dbsnp_fn, x.genotype_info)
 
       x.initialize_tables()
-      x.clipseq_reads_coverage()
-      x.rnaseq_reads_coverage()
+      sys.stderr.write('Reading CLIP-seq mapped reads file from: ' + \
+                        str(args.clipseq) + '\n')
+
+      x.clipseq_reads_coverage(args.nthreads)
+      sys.stderr.write('Reading RNA-seq mapped reads file from: ' + \
+                        str(args.rnaseq) + '\n')
+      x.rnaseq_reads_coverage(args.nthreads)
 
       asprin_qvalues, asprin_odds_ratio = \
         Model(minimum_coverage).perform_test(x.genotype_info, \
                                              x.clip_reads, \
-                                             x.rna_reads)
+                                             x.clip_coverage, \
+                                             x.rna_reads, \
+                                             x.rna_coverage)
 
       write_output(x.genotype_info, x.clip_reads, x.clip_coverage, \
                    x.rna_reads, x.rna_coverage, asprin_qvalues, \

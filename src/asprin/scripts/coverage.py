@@ -25,17 +25,16 @@ import thread
 from multiprocessing.dummy import Pool as ThreadPool
 
 class Coverage :
-  def __init__(self, clipseq_fn, rnaseq_fn, \
-               minimum_coverage, nthreads, all_variants):
+  def __init__(self, clipseq_fn, rnaseq_fn, minimum_coverage):
                
     self.clipseq_fn = clipseq_fn
     self.rnaseq_fn = rnaseq_fn
     self.minimum_coverage = minimum_coverage
-    self.nthreads = nthreads
-    self.all_variants = all_variants
 
     self.genotype_info = defaultdict(lambda: defaultdict(list))
     self.snp_counter = 0
+    self.radar_counter = 0
+    self.dbsnp_counter = 0
 
     self.bar = progressbar.ProgressBar()
     self.progress_counter = 0
@@ -77,25 +76,21 @@ class Coverage :
       self.progress_counter += 1
       self.bar.update(self.progress_counter)
 
-  def clipseq_reads_coverage(self):
-    sys.stderr.write('Reading CLIP-seq mapped reads file from: ' + \
-                      self.clipseq_fn + '\n')
+  def clipseq_reads_coverage(self, nthreads):
     self.bar = progressbar.ProgressBar(maxval=self.snp_counter, \
       widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
     self.progress_counter = 0
     self.bar.start()
-    pool = ThreadPool(self.nthreads)
+    pool = ThreadPool(nthreads)
     pool.map(self.clipseq_reads_coverage_chrom, self.genotype_info)
     self.bar.finish()
 
-  def rnaseq_reads_coverage(self):
-    sys.stderr.write('Reading RNA-seq mapped reads file from: ' + \
-                      self.rnaseq_fn + '\n')
+  def rnaseq_reads_coverage(self, nthreads):
     self.bar = progressbar.ProgressBar(maxval=self.snp_counter, \
       widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
     self.progress_counter = 0
     self.bar.start()
-    pool = ThreadPool(self.nthreads)
+    pool = ThreadPool(nthreads)
     pool.map(self.rnaseq_reads_coverage_chrom, self.genotype_info)
     self.bar.finish()
 
