@@ -81,8 +81,10 @@ class Coverage :
       widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
     self.progress_counter = 0
     self.bar.start()
-    pool = ThreadPool(nthreads)
-    pool.map(self.clipseq_reads_coverage_chrom, self.genotype_info)
+#    pool = ThreadPool(nthreads)
+#    pool.map(self.clipseq_reads_coverage_chrom, self.genotype_info)
+    for chrom in self.genotype_info :
+      self.clipseq_reads_coverage_chrom(chrom)
     self.bar.finish()
 
   def rnaseq_reads_coverage(self, nthreads):
@@ -90,8 +92,10 @@ class Coverage :
       widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
     self.progress_counter = 0
     self.bar.start()
-    pool = ThreadPool(nthreads)
-    pool.map(self.rnaseq_reads_coverage_chrom, self.genotype_info)
+#    pool = ThreadPool(nthreads)
+#    pool.map(self.rnaseq_reads_coverage_chrom, self.genotype_info)
+    for chrom in self.genotype_info :
+      self.rnaseq_reads_coverage_chrom(chrom)
     self.bar.finish()
 
   def initialize_tables(self):
