@@ -39,18 +39,19 @@ class Coverage :
     self.bar = progressbar.ProgressBar()
     self.progress_counter = 0
 
-    self.clip_seq_file = pysam.AlignmentFile(clipseq_fn)
+#    self.clip_seq_file = pysam.AlignmentFile(clipseq_fn)
     self.clip_reads = defaultdict(lambda: defaultdict(list))
     self.clip_coverage = defaultdict(lambda: defaultdict())
 
-    self.rna_seq_file = pysam.AlignmentFile(rnaseq_fn)
+#    self.rna_seq_file = pysam.AlignmentFile(rnaseq_fn)
     self.rna_reads = defaultdict(lambda: defaultdict(list))
     self.rna_coverage = defaultdict(lambda: defaultdict())
 
   def clipseq_reads_coverage_chrom(self, chrom):
+    clip_seq_file = pysam.AlignmentFile(self.clipseq_fn)
     for pos in self.genotype_info[chrom]:
       if (self.genotype_info[chrom][pos][2] != "none") :
-        for pileupcolumn in self.clip_seq_file.pileup(chrom, pos-1, pos, \
+        for pileupcolumn in clip_seq_file.pileup(chrom, pos-1, pos, \
                                              truncate=True, stepper="nofilter"):
           for pileupread in pileupcolumn.pileups:
             if not pileupread.is_del and not pileupread.is_refskip:
@@ -62,10 +63,11 @@ class Coverage :
       self.bar.update(self.progress_counter)
 
   def rnaseq_reads_coverage_chrom(self, chrom):
+    rna_seq_file = pysam.AlignmentFile(self.rnaseq_fn)
     for pos in self.genotype_info[chrom]:
       if (self.genotype_info[chrom][pos][2] != "none" and \
           self.clip_coverage[chrom][pos] >= self.minimum_coverage) :
-        for pileupcolumn in self.rna_seq_file.pileup(chrom, pos-1, pos, \
+        for pileupcolumn in rna_seq_file.pileup(chrom, pos-1, pos, \
                                              truncate=True, stepper="nofilter"):
           for pileupread in pileupcolumn.pileups:
             if not pileupread.is_del and not pileupread.is_refskip:
@@ -81,10 +83,10 @@ class Coverage :
       widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
     self.progress_counter = 0
     self.bar.start()
-#    pool = ThreadPool(nthreads)
-#    pool.map(self.clipseq_reads_coverage_chrom, self.genotype_info)
-    for chrom in self.genotype_info :
-      self.clipseq_reads_coverage_chrom(chrom)
+    pool = ThreadPool(nthreads)
+    pool.map(self.clipseq_reads_coverage_chrom, self.genotype_info)
+#    for chrom in self.genotype_info :
+#      self.clipseq_reads_coverage_chrom(chrom)
     self.bar.finish()
 
   def rnaseq_reads_coverage(self, nthreads):
@@ -92,10 +94,10 @@ class Coverage :
       widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
     self.progress_counter = 0
     self.bar.start()
-#    pool = ThreadPool(nthreads)
-#    pool.map(self.rnaseq_reads_coverage_chrom, self.genotype_info)
-    for chrom in self.genotype_info :
-      self.rnaseq_reads_coverage_chrom(chrom)
+    pool = ThreadPool(nthreads)
+    pool.map(self.rnaseq_reads_coverage_chrom, self.genotype_info)
+#    for chrom in self.genotype_info :
+#      self.rnaseq_reads_coverage_chrom(chrom)
     self.bar.finish()
 
   def initialize_tables(self):

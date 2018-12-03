@@ -47,7 +47,7 @@ def write_output(genotype_info, clip_reads, clip_coverage, \
               str(rna_reads[chrom][pos]['C']) + " , " + \
               str(rna_reads[chrom][pos]['G']) + " , " + \
               str(rna_reads[chrom][pos]['T']) + "]\t" + \
-              str(asprin_qvalues[i]) + "\t" + str(asprin_odds_ratio[i])
+              str(round(asprin_qvalues[i],6)) + "\t" + str(round(asprin_odds_ratio[i],6))
         i += 1
 
 
@@ -58,11 +58,12 @@ def main() :
   group.add_argument("-g", metavar="Genotype file", dest="genotype")
   group.add_argument("-c", metavar="CLIP-seq mapped reads file", dest="clipseq")
   group.add_argument("-r", metavar="RNA-seq mapped reads file", dest="rnaseq")
+  parser.add_argument("-o", metavar="output file (default: std)", dest="output_file")
   parser.add_argument("-s", metavar="dbSNP VCF file", dest="dbsnp")
   parser.add_argument("-e", metavar="RADAR RNA editing database file", \
                       dest="radar")
   parser.add_argument("-t", type=int, default=25, dest="nthreads", \
-                      metavar="Number of threads (default: 25)")
+                      metavar="Number of threads (default: number of chromosomes in SNV file)")
   parser.add_argument("-a", default="False", help="Use all the variants", \
                       action="store_true", dest="allvariants")
 
@@ -89,6 +90,9 @@ def main() :
         radar_fn = ""
       else :
         radar_fn = args.radar
+      if (args.output_file):
+        sys.stdout = open(args.output_file, 'w')
+
 
       minimum_coverage = 10
       x = Coverage(args.clipseq, args.rnaseq, minimum_coverage)

@@ -23,8 +23,8 @@ import progressbar
 
 class Genotype :
   def __init__(self) :
-    self.dbsnp_size = 323138224
-    self.radar_size = 2576459
+    self.dbsnp_size = 0
+    self.radar_size = 0
 
   def read_genotype_info(self, genotype_fn, is_variant_id):
 
@@ -81,6 +81,9 @@ class Genotype :
                     'alu?','non_alu_repetitive?','conservation_chimp',\
                     'conservation_rhesus','conservation_mouse']
     radar_in = open(radar_fn)
+    self.radar_size = sum(1 for line in radar_in)
+    radar_in.close()
+    radar_in = open(radar_fn)
     bar = progressbar.ProgressBar(maxval=self.radar_size, \
       widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
     bar.start()
@@ -107,6 +110,9 @@ class Genotype :
     ret_genotype_info = genotype_info
     dbsnp_counter = 0
     DBSNP_HEADER = ['CHROM','POS','ID','REF','ALT','QUAL','FILTER','INFO']
+    dbsnp_in = open(dbsnp_fn)
+    self.dbsnp_size = sum(1 for line in dbsnp_in)
+    dbsnp_in.close()
     dbsnp_in = open(dbsnp_fn)
     bar = progressbar.ProgressBar(maxval=self.dbsnp_size, \
       widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
