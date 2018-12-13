@@ -170,9 +170,9 @@ dbSNP and RADAR databases:
 ---------------------------------------
 dbSNP and RADAR under hg19 annotations databases can be downloaded from here:
 
-dbSNP: ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/All_20180418.vcf.gz
+dbSNP: [ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/All_20180418.vcf.gz](ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/All_20180418.vcf.gz)
 
-RADAR: http://lilab.stanford.edu/GokulR/database/Human_AG_all_hg19_v2.txt
+RADAR: [http://lilab.stanford.edu/GokulR/database/Human_AG_all_hg19_v2.txt](http://lilab.stanford.edu/GokulR/database/Human_AG_all_hg19_v2.txt)
 
 For other versions of the databases please visit dbSNP and RADAR websites.
 
