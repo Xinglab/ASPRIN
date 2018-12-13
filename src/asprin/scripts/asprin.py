@@ -63,7 +63,7 @@ def main() :
   parser.add_argument("-e", metavar="RADAR RNA editing database file", \
                       dest="radar")
   parser.add_argument("-t", type=int, default=25, dest="nthreads", \
-                      metavar="Number of threads (default: number of chromosomes in SNV file)")
+                      metavar="Number of threads (default: 25)")
   parser.add_argument("-a", default="False", help="Use all the variants", \
                       action="store_true", dest="allvariants")
 

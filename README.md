@@ -68,7 +68,7 @@ To run ASPRIN, 3 arguments have to be provided:
    eCLIP processing pipeline up to and before calling peaks.
 
 3) RNA-seq data, mapped reads in .bam file format, sorted based on coordinates 
-   and indexed, following any RNA-seq mapping procedure of choise.
+   and indexed, following any RNA-seq mapping procedure of choice.
 
 In addition, 4 optional arguments can be provided to filter SNVs and focus on variants
 of choice, or simply just label variants:
