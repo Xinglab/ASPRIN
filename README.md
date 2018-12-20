@@ -77,7 +77,7 @@ of choice, or simply just label variants:
    that are in the VCF file.
 
 2) RADAR RNA editing database file: To focus or simply just lebel variants that are known 
-   RNA-edditing events.
+   RNA-editing events.
 
 3) Number of threads (the default value is 25)
 
