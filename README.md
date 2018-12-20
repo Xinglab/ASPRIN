@@ -74,7 +74,7 @@ In addition, 4 optional arguments can be provided to filter SNVs and focus on va
 of choice, or simply just label variants:
 
 1) dbSNP VCF file: To be able to filter noise, focus on SNPs, or simply label the SNPs 
-   that are in the SNV file.
+   that are in the VCF file.
 
 2) RADAR RNA editing database file: To focus or simply just lebel variants that are known 
    RNA-edditing events.
