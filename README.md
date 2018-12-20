@@ -77,11 +77,11 @@ of choice, or simply just label variants:
    that are in the VCF file.
 
 2) RADAR RNA editing database file: To focus or simply just lebel variants that are known 
-   RNA-editing events.
+   RNA editing events.
 
 3) Number of threads (the default value is 25)
 
-4) -a option, to consider all the variants, even if dbSNP and RNA edditting files are 
+4) -a option, to consider all the variants, even if dbSNP and RNA editing files are 
    provided for labeling the variants.
 
 ```bash
@@ -137,7 +137,7 @@ ASPRIN has 5 different modes of operation:
              -e example/radar_test.txt
              -c example/RBFOX2_HepG2_clip_test.bam
              -r example/HepG2_total_rnaseq_test.bam
-             -o output_editting.txt
+             -o output_editing.txt
 ```
 
 4) Running on variants in both dbSNP and RADAR 
@@ -148,7 +148,7 @@ ASPRIN has 5 different modes of operation:
              -e example/radar_test.txt
              -c example/RBFOX2_HepG2_clip_test.bam
              -r example/HepG2_total_rnaseq_test.bam
-             -o output_snps_and_editting.txt
+             -o output_snps_and_editing.txt
 ```
 
 5) Running on all variants but label the SNPs and RNA editing events:
